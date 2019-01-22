@@ -9,17 +9,24 @@ class HashMap {
   get(key) {
     const index = this._findSlot(key)
     if (this._slots[index] === undefined) {
-      throw new Error('Key error')
+      // throw new Error('Key error')
+      return null
     }
     return this._slots[index].value
   }
 
   set(key, value) {
+    // if index is already filled, check the next one
     const loadRatio = (this.length + 1) / this._capacity
     if (loadRatio > HashMap.MAX_LOAD_RATIO) {
       this._resize(this._capacity * HashMap.SIZE_RATIO)
     }
-    const index = this._findSlot(key)
+    let index = this._findSlot(key)
+    // while (this._slots[index]) {
+    //   index === this._capacity
+    //     ? index = 0
+    //     : index++
+    // }
     this._slots[index] = {
       key,
       value,
@@ -42,13 +49,10 @@ class HashMap {
   _findSlot(key) {
     const hash = HashMap._hashString(key)
     const start = hash % this._capacity
-
-    for (let i = start; i < start + this._capacity; i++) {
-      const index = i % this._capacity
-      const slot = this._slots[index]
-      if (slot === undefined || (slot.key == key && !slot.deleted)) {
-        return index
-      }
+    const index = i % this._capacity
+    const slot = this._slots[index]
+    if (slot === undefined || (slot.key == key && !slot.deleted)) {
+      return index
     }
   }
 
@@ -67,10 +71,6 @@ class HashMap {
   }
 
   static _hashString(string) {
-    // static is something you want to be the same over all instances of this class
-    // variables time-span is entire life of program
-    // look at javascript garbage collector see how it works.
-    // new HashMap() === new instance --> static will be consistent through every new instance
     let hash = 5381
     for (let i = 0; i < string.length; i++) {
       hash = (hash << 5) + hash + string.charCodeAt(i)
@@ -82,3 +82,5 @@ class HashMap {
 
 HashMap.MAX_LOAD_RATIO = 0.9
 HashMap.SIZE_RATIO = 3 // When we're resizing it, multiply size of array by 3?
+
+module.exports = HashMap
